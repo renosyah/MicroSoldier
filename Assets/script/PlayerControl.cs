@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class PlayerControl : MonoBehaviour {
 
@@ -13,23 +15,42 @@ public class PlayerControl : MonoBehaviour {
     Rigidbody2D rd;
     Animator anim;
 
+    Text score;
+    Text HEALTHPLAYER;
+    
+    GameObject playerObj;
+    GameObject ButtonPlayAggain;
 
-	// Use this for initialization
-	void Start () {
+ 
+    AudioSource audioPlayer;
+
+
+    // Use this for initialization
+    void Start () {
 
         rd = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         facingRight = true;
         Jumping = false;
-        
+        score = GameObject.Find("GameScore").GetComponent<Text>();
+        HEALTHPLAYER = GameObject.Find("HEALTHPLAYER").GetComponent<Text>();
+        playerObj = GameObject.Find("player");
+        ButtonPlayAggain = GameObject.Find("ButtonPlayAgain");
+
+        audioPlayer = GetComponent<AudioSource>();
 
 
+        ButtonPlayAggain.SetActive(false);
     }
+    
 	
 	// Update is called once per frame
 	void Update () {
         MovePlayer(Speed);
-
+        if (playerObj == null)
+        {
+            score.text = "GAME OVER, Score " + score.text;
+        }
 
         if (Input.GetKeyDown(KeyCode.D))
         {
@@ -53,10 +74,12 @@ public class PlayerControl : MonoBehaviour {
 
         if (Input.GetKeyDown(KeyCode.E))
         {
+            
             attackNow = true;
         }
         else if (Input.GetKeyUp(KeyCode.E))
         {
+          
             attackNow = false;
             anim.SetInteger("StatePlayer", 1);
 
@@ -64,6 +87,7 @@ public class PlayerControl : MonoBehaviour {
 
         if (attackNow)
         {
+           
             anim.SetInteger("StatePlayer", 4);
         }
 
@@ -94,6 +118,8 @@ public class PlayerControl : MonoBehaviour {
         }
 
         rd.velocity = new Vector3(speed, rd.velocity.y, 0);
+
+        
         
     }
 
@@ -110,15 +136,56 @@ public class PlayerControl : MonoBehaviour {
 
 
 
-
-   void OnCollisionEnter2D(Collision2D other)
+    int HP = 5;
+    void OnCollisionEnter2D(Collision2D other)
     {
+        
         if(other.gameObject.tag == "GROUND")
         {
             Jumping = false;
             
             anim.SetInteger("StatePlayer", 1);
         }
+        if (other.gameObject.tag == "GameItem")
+        {
+            Jumping = false;
+
+            anim.SetInteger("StatePlayer", 1);
+        }
+        if (other.gameObject.tag == "ENEMYSWORD")
+        {
+            Jumping = false;
+            HP--;
+           
+            
+ 
+
+            if (HP == 0)
+            {
+                score.text = "GAME OVER! \nYour Score " + score.text;
+                Destroy(this.gameObject);
+                ButtonPlayAggain.SetActive(true);
+
+            }
+            else if (HP <= 3 || HP == 3 || HP == 4)
+            {
+                Destroy(GameObject.Find("player/arms_1/shield"));
+
+
+            }
+            else if (HP <= 2 || HP == 2 || HP == 1)
+            {
+                Destroy(GameObject.Find("player/head/helm"));
+            }
+            HEALTHPLAYER.text = "x "+ HP + "";
+             
+        }
+    }
+
+    public void RestoreHp()
+    {
+        HP = 5;
+        HEALTHPLAYER.text = "x " + HP + "";
     }
 
 
@@ -132,6 +199,7 @@ public class PlayerControl : MonoBehaviour {
     }
     public void AttackEvent()
     {
+      
         attackNow = true;
         
     }
@@ -150,7 +218,26 @@ public class PlayerControl : MonoBehaviour {
     public void StopMove()
     {
         Speed = 0;
-        attackNow = false;
+        
         anim.SetInteger("StatePlayer", 1);
     }
+
+    public void StopAttack()
+    {
+        
+        attackNow = false;
+    }
+
+    
+
+    public void PlaySwingSword()
+    {
+        audioPlayer.Play();
+       
+    }
+    public void StopSwingSword()
+    {
+        audioPlayer.Stop();
+    }
+
 }

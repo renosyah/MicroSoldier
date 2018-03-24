@@ -5,6 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - GROUND
+  - PLAYERSWORD
+  - GameItem
+  - ENEMY_WAYPOINT
+  - ENEMY
+  - ENEMYSWORD
   layers:
   - Default
   - TransparentFX
@@ -15,7 +20,7 @@ TagManager:
   - 
   - 
   - PlayerLayer
-  - 
+  - enemy
   - 
   - 
   - 
